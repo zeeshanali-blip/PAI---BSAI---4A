@@ -1,0 +1,48 @@
+from flask import Flask, render_template, request, jsonify
+import requests
+
+app = Flask(__name__)
+
+# Home route
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
+# Search route
+@app.route('/search', methods=['POST'])
+def search():
+    vehicle_name = request.json.get('vehicle')
+
+    if not vehicle_name:
+        return jsonify({'error': 'No vehicle provided'}), 400
+
+    try:
+        # Free API (NHTSA Vehicle API)
+        url = f"https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/{vehicle_name}?format=json"
+        response = requests.get(url)
+        data = response.json()
+
+        if data['Count'] == 0:
+            return jsonify({'message': 'No data found'})
+
+        # Take first few results
+        vehicles = []
+        for item in data['Results'][:5]:
+            vehicles.append({
+                'make': item['Make_Name'],
+                'model': item['Model_Name']
+            })
+
+        return jsonify({'results': vehicles})
+
+    except Exception as e:
+        return jsonify({'error': 'Something went wrong'}), 500
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+
