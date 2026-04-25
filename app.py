@@ -1,52 +1,36 @@
-from flask import Flask, render_template, request
-import requests
-from bs4 import BeautifulSoup
-import re
-import csv
-import os
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-CSV_FILE = "emails.csv"
+# simple function to decide response for user input
+def get_bot_response(user_input):
+    text = user_input.lower()
 
-def scrape_emails(url):
-    try:
-        response = requests.get(url, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
-        text = soup.get_text()
+    if 'admission' in text or 'apply' in text:
+        return 'To apply, fill out the application form, submit your documents, and pay the application fee.'
+    elif 'deadline' in text or 'when' in text:
+        return 'The admission deadline is usually in late July for the fall semester and early December for spring.'
+    elif 'fee' in text or 'tuition' in text:
+        return 'Tuition fees depend on the program, but you can expect around $5000 per semester for most courses.'
+    elif 'program' in text or 'course' in text:
+        return 'We offer programs in Computer Science, Business, and Engineering. Check the website for full details.'
+    elif 'requirement' in text or 'documents' in text:
+        return 'You need your high school transcript, test scores, ID, and any recommendation letters.'
+    elif 'hello' in text or 'hi' in text:
+        return 'Hello! I am the admission bot. Ask me about admission process, deadlines, fees, programs, or requirements.'
+    else:
+        return 'I am not sure about that. Please ask about admission process, deadlines, fee, programs, or requirements.'
 
-        emails = set(
-            re.findall(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", text)
-        )
-        return emails
-    except:
-        return set()
-
-def save_to_csv(url, emails):
-    if not emails:
-        return
-
-    file_exists = os.path.isfile(CSV_FILE)
-
-    with open(CSV_FILE, "a", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
-
-        if not file_exists:
-            writer.writerow(["URL", "Email"])
-
-        for email in emails:
-            writer.writerow([url, email])
-
-@app.route("/", methods=["GET", "POST"])
+@app.route('/')
 def index():
-    emails = []
+    return render_template('index.html')
 
-    if request.method == "POST":
-        url = request.form.get("url")
-        emails = scrape_emails(url)
-        save_to_csv(url, emails)
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    user_input = data.get('message', '')
+    response = get_bot_response(user_input)
+    return jsonify({'reply': response})
 
-    return render_template("index.html", emails=emails)
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
