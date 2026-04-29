@@ -1,0 +1,19 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QnA Bot</title>
+</head>
+<body>
+    <h2>Simple QnA Bot</h2>
+    <form method="POST">
+        <input type="text" name="question" placeholder="Ask question" style="width:300px;">
+        <button type="submit">Search</button>
+    </form>
+
+    <h3>Results:</h3>
+    {% for a in answers %}
+        <p>{{a}}</p>
+    {% endfor %}
+</body>
+</html>

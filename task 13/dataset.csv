@@ -1,0 +1,11 @@
+question,answer
+What is AI?,AI is the simulation of human intelligence in machines.
+What is machine learning?,Machine learning is a method where computers learn from data.
+What is deep learning?,Deep learning is a subset of machine learning using neural networks.
+What is Python?,Python is a programming language used in AI and data science.
+What is NLP?,NLP helps computers understand human language.
+What is dataset?,Dataset is a collection of data used for training models.
+What is FAISS?,FAISS is a library for fast similarity search using vectors.
+What is embedding?,Embedding converts text into numerical form.
+What is Flask?,Flask is a lightweight Python web framework.
+What is Hugging Face?,Hugging Face provides AI models and tools for NLP.
