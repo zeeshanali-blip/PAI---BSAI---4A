@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drowsiness Detection System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 32px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            color: #333;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin: 0 0 24px;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 24px 0;
+            flex-wrap: wrap;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 12px 28px;
+            background-color: #667eea;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .stop-btn {
+            background-color: #ff6b6b;
+        }
+
+        .stop-btn:hover:not(:disabled) {
+            background-color: #ee5a52;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.ready {
+            background-color: #4caf50;
+        }
+
+        .status-indicator.error {
+            background-color: #ff6b6b;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text {
+            margin: 16px 0;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .status-text.error {
+            background-color: #ffebee;
+            color: #c62828;
+            display: none;
+        }
+
+        .status-text.error.show {
+            display: block;
+        }
+
+        .status-text.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .video-box {
+            margin-top: 28px;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+            background: #000;
+        }
+
+        .video-box.active {
+            display: block;
+        }
+
+        .video-box img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .info-box {
+            background-color: #f5f5f5;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 24px;
+            text-align: left;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .info-box h3 {
+            margin: 0 0 12px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .info-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .info-box li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 Drowsiness Detection System</h1>
+        <p class="subtitle">Real-time face and eye detection using AI</p>
+        
+        <div id="statusText" class="status-text success">
+            <span class="status-indicator ready"></span>
+            <span>System ready. Click "Start Camera" to begin.</span>
+        </div>
+        <div id="errorText" class="status-text error"></div>
+
+        <div class="button-group">
+            <button id="startButton">Start Camera</button>
+            <button id="stopButton" style="display:none;" class="stop-btn">Stop Camera</button>
+        </div>
+
+        <div class="video-box" id="videoBox">
+            <img id="videoFeed" alt="Live webcam feed">
+        </div>
+
+        <div class="info-box">
+            <h3>ℹ️ How it works:</h3>
+            <ul>
+                <li>Detects faces in real-time using your webcam</li>
+                <li>Monitors eye status to detect drowsiness</li>
+                <li>Alerts when drowsiness is detected</li>
+                <li>Green rectangles = eyes detected | Blue rectangles = face detected</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const videoBox = document.getElementById('videoBox');
+        const videoFeed = document.getElementById('videoFeed');
+        const statusText = document.getElementById('statusText');
+        const errorText = document.getElementById('errorText');
+
+        // Check camera status on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/camera_status');
+                const data = await response.json();
+                if (!data.initialized && data.error) {
+                    showError(data.error);
+                }
+            } catch (err) {
+                console.error('Failed to check camera status:', err);
+            }
+        });
+
+        startButton.addEventListener('click', () => {
+            videoBox.classList.add('active');
+            videoFeed.src = '/video_feed?' + new Date().getTime(); // Cache bust
+            startButton.style.display = 'none';
+            stopButton.style.display = 'inline-block';
+            statusText.textContent = 'Camera stream is active...';
+        });
+
+        stopButton.addEventListener('click', () => {
+            videoBox.classList.remove('active');
+            videoFeed.src = '';
+            startButton.style.display = 'inline-block';
+            stopButton.style.display = 'none';
+            statusText.textContent = 'Camera stopped. Click "Start Camera" to resume.';
+        });
+
+        function showError(message) {
+            errorText.textContent = '❌ ' + message;
+            errorText.classList.add('show');
+            statusText.style.display = 'none';
+            startButton.disabled = true;
+        }
+    </script>
+</body>
+</html>
+
+</body>
+</html>
