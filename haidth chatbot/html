@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hadith QA Bot</title>
+
+    <!-- Google Fonts: Amiri (Arabic-inspired serif) + Inter for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ── Reset & base ── */
+        
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+         :root {
+            --gold: #c9a84c;
+            --gold-light: #e8c97a;
+            --green-dark: #1a3a2a;
+            --green-mid: #2d5a3d;
+            --green-light: #3d7a52;
+            --cream: #faf6ee;
+            --text-dark: #1a1a1a;
+            --text-mid: #4a4a4a;
+            --text-light: #7a7a7a;
+            --card-bg: #ffffff;
+            --border: rgba(201, 168, 76, 0.25);
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+        /* ── Decorative header ── */
+        
+        header {
+            background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 60%, var(--green-light) 100%);
+            padding: 48px 24px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 20% 50%, rgba(201, 168, 76, 0.12) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(201, 168, 76, 0.08) 0%, transparent 40%);
+        }
+        /* Decorative geometric border */
+        
+        header::after {
+            content: '';
+            display: block;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+        }
+        
+        .logo-arabic {
+            font-family: 'Amiri', serif;
+            font-size: clamp(28px, 5vw, 44px);
+            color: var(--gold-light);
+            letter-spacing: 2px;
+            line-height: 1.2;
+            position: relative;
+        }
+        
+        .logo-sub {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.65);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-top: 6px;
+        }
+        /* Decorative geometric shapes */
+        
+        .gem {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--gold);
+            transform: rotate(45deg);
+            margin: 0 10px;
+            vertical-align: middle;
+        }
+        /* ── Main container ── */
+        
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+        /* ── Search card ── */
+        
+        .search-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 36px 32px;
+            margin-bottom: 36px;
+        }
+        
+        .search-card h2 {
+            font-family: 'Amiri', serif;
+            font-size: 22px;
+            color: var(--green-dark);
+            margin-bottom: 8px;
+        }
+        
+        .search-card p {
+            font-size: 13.5px;
+            color: var(--text-light);
+            margin-bottom: 22px;
+            line-height: 1.6;
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        input[name="query"] {
+            flex: 1;
+            min-width: 220px;
+            padding: 14px 18px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            color: var(--text-dark);
+            background: #f9f6f0;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        input[name="query"]:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+            background: #fff;
+        }
+        
+        button[type="submit"] {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: transform 0.15s, box-shadow 0.15s;
+            white-space: nowrap;
+        }
+        
+        button[type="submit"]:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(29, 90, 61, 0.35);
+        }
+        /* Sample queries */
+        
+        .samples {
+            margin-top: 16px;
+        }
+        
+        .samples span {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-right: 6px;
+        }
+        
+        .sample-btn {
+            display: inline-block;
+            margin: 4px 4px 0 0;
+            padding: 4px 12px;
+            background: rgba(201, 168, 76, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--green-dark);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s;
+        }
+        
+        .sample-btn:hover {
+            background: rgba(201, 168, 76, 0.2);
+        }
+        /* ── Results section ── */
+        
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .results-header h3 {
+            font-family: 'Amiri', serif;
+            font-size: 20px;
+            color: var(--green-dark);
+        }
+        
+        .results-header .query-badge {
+            background: var(--green-dark);
+            color: var(--gold-light);
+            font-size: 12px;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+        }
+        /* ── Hadith result card ── */
+        
+        .hadith-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            padding: 28px 28px 22px;
+            margin-bottom: 18px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeUp 0.4s ease both;
+        }
+        
+        .hadith-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+        
+        .hadith-card:nth-child(2) {
+            animation-delay: 0.10s;
+        }
+        
+        .hadith-card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+        
+        .hadith-card:nth-child(4) {
+            animation-delay: 0.20s;
+        }
+        
+        .hadith-card:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+        
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Gold left accent bar */
+        
+        .hadith-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--gold), var(--gold-light));
+            border-radius: 4px 0 0 4px;
+        }
+        
+        .card-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        
+        .rank-badge {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .relevance {
+            font-size: 11.5px;
+            color: var(--text-light);
+            background: #f3f0ea;
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-left: auto;
+        }
+        /* Relevance colour coding */
+        
+        .relevance.high {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .relevance.medium {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+        
+        .relevance.low {
+            background: #fce4ec;
+            color: #c62828;
+        }
+        
+        .hadith-text {
+            font-family: 'Amiri', serif;
+            font-size: 18px;
+            line-height: 1.75;
+            color: var(--text-dark);
+            padding-left: 6px;
+        }
+        /* ── Empty state ── */
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+        
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state p {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        /* ── Footer ── */
+        
+        footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 12px;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+        }
+        /* ── Responsive ── */
+        
+        @media (max-width: 600px) {
+            .search-card {
+                padding: 24px 18px;
+            }
+            .hadith-card {
+                padding: 22px 18px 18px;
+            }
+            .hadith-text {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ─── Header ─────────────────────────────────────────────────────────────── -->
+    <header>
+        <div class="logo-arabic">
+            <span class="gem"></span> Hadith Question &amp; Answer Bot
+            <span class="gem"></span>
+        </div>
+        <div class="logo-sub">Semantic Search · paraphrase-MiniLM-L6-v2 · FAISS</div>
+    </header>
+
+    <!-- ─── Main ───────────────────────────────────────────────────────────────── -->
+    <main class="container">
+
+        <!-- Search Form -->
+        <div class="search-card">
+            <h2>Ask About Any Islamic Topic</h2>
+            <p>Type a question or keyword and the bot will find the most relevant Hadiths using AI semantic similarity.</p>
+
+            <form method="POST" action="/">
+                <div class="search-row">
+                    <input type="text" name="query" id="queryInput" placeholder="e.g. Fasting in Ramadan, Signs of the End of Time…" value="{{ query | e }}" required autocomplete="off" />
+                    <button type="submit">&#128269; Search</button>
+                </div>
+            </form>
+
+            <!-- Quick-fill sample queries -->
+            <div class="samples">
+                <span>Try:</span>
+                <button class="sample-btn" onclick="fill('Fasting in Ramadan')">Fasting in Ramadan</button>
+                <button class="sample-btn" onclick="fill('Signs of the End of Time')">Signs of End Times</button>
+                <button class="sample-btn" onclick="fill('importance of prayer')">Importance of Prayer</button>
+                <button class="sample-btn" onclick="fill('treating parents with kindness')">Kindness to Parents</button>
+                <button class="sample-btn" onclick="fill('seeking knowledge')">Seeking Knowledge</button>
+                <button class="sample-btn" onclick="fill('repentance and forgiveness')">Repentance</button>
+            </div>
+        </div>
+
+        <!-- ─── Results ─────────────────────────────────────────────────────────── -->
+        {% if results %}
+        <div class="results-header">
+            <h3>Top {{ results | length }} Results</h3>
+            <span class="query-badge">{{ query }}</span>
+        </div>
+
+        {% for item in results %} {# Colour-code relevance by L2 distance: lower = better #} {% if item.distance
+        < 0.8 %} {% set rel_class="high" %} {% set rel_label="High Relevance" %} {% elif item.distance < 1.5 %} {% set rel_class="medium" %} {% set
+            rel_label="Medium Relevance" %} {% else %} {% set rel_class="low" %} {% set rel_label="Low Relevance" %} {% endif %} <div class="hadith-card">
+            <div class="card-top">
+                <div class="rank-badge">{{ item.rank }}</div>
+                <span class="relevance {{ rel_class }}">{{ rel_label }} &nbsp;(dist: {{ item.distance }})</span>
+            </div>
+            <p class="hadith-text">{{ item.hadith }}</p>
+            </div>
+            {% endfor %} {% elif query %}
+            <!-- Query was submitted but no results -->
+            <div class="empty-state">
+                <div class="icon">🔍</div>
+                <p>No results found for <strong>"{{ query }}"</strong>.<br>Try a different keyword or phrase.</p>
+            </div>
+
+            {% else %}
+            <!-- Initial page load — no query yet -->
+            <div class="empty-state">
+                <div class="icon">☪️</div>
+                <p>Enter a topic above to discover relevant Hadiths.<br> The AI compares your query's <em>meaning</em> to every Hadith — not just keywords.</p>
+            </div>
+            {% endif %}
+
+    </main>
+
+    <!-- ─── Footer ─────────────────────────────────────────────────────────────── -->
+    <footer>
+        Hadith QA Bot &nbsp;·&nbsp; SentenceTransformers + FAISS &nbsp;·&nbsp; Lab Project
+    </footer>
+
+    <script>
+        // Fill the query input when a sample button is clicked and auto-submit
+        function fill(text) {
+            document.getElementById('queryInput').value = text;
+            document.querySelector('form').submit();
+        }
+    </script>
+
+</body>
+
+</html>
